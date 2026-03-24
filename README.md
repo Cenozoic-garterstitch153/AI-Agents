@@ -1,4 +1,4 @@
-# 🤖 AI-Agents
+# AI-Agents
 
 > A structured guide to build and orchestrate a complete AI-powered software development team using specialized agents, MCP tools, skills, contracts, and shared memory across projects.
 
@@ -308,14 +308,14 @@ Fork or copy this repo to your private one and fill in the real values.
 
 | Component | Status |
 |---|---|
-| `roles/` | ✅ 7 agents defined |
-| `skills/` | ✅ .NET · Vue 3 · PostgreSQL |
-| `conventions.md` | ✅ Branches · commits · naming |
-| `prompts/` | 🟡 Built from real usage |
-| `projects-memories/` | ✅ Template + contracts system |
-| `mcp/` | ✅ Config + custom server guide |
-| `orchestrator/` | ✅ Example ready — configure in private repo |
-| `agents/*.ts` | 🔜 Individual agent wrappers |
+| `roles/` |  7 agents defined |
+| `skills/` |  .NET · Vue 3 · PostgreSQL |
+| `conventions.md` |  Branches · commits · naming |
+| `prompts/` |  Built from real usage |
+| `projects-memories/` |  Template + contracts system |
+| `mcp/` |  Config + custom server guide |
+| `orchestrator/` |  Example ready — configure in private repo |
+| `agents/*.ts` |  Individual agent wrappers |
 
 ---
 
